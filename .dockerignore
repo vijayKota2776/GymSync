@@ -1,0 +1,12 @@
+node_modules
+.git
+.github
+.gitignore
+.env
+.env.*
+server/gymsync.db
+certbot
+*.md
+.vscode
+.idea
+.DS_Store

@@ -1,0 +1,66 @@
+# ==========================================================================
+# GymSync — Docker Compose (Production)
+# Runs: Nginx (frontend) + Express API (backend)
+# ==========================================================================
+
+services:
+  # Backend API
+  gymsync-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gymsync-api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - api-data:/app/data
+    networks:
+      - gymsync-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Frontend + Reverse Proxy
+  gymsync-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    container_name: gymsync-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      gymsync-api:
+        condition: service_healthy
+    volumes:
+      - ./nginx/app.conf:/etc/nginx/conf.d/app.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    networks:
+      - gymsync-net
+
+  # Certbot for SSL (optional — run manually)
+  certbot:
+    image: certbot/certbot
+    container_name: gymsync-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done'"
+    profiles:
+      - ssl
+
+volumes:
+  api-data:
+    driver: local
+
+networks:
+  gymsync-net:
+    driver: bridge

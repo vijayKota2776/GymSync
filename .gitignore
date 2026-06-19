@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.pnp.*
+
+# Build output
+dist/
+
+# Database (local only — production uses Docker volume)
+server/gymsync.db
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker data
+certbot/
+
+# Logs
+*.log
+npm-debug.log*
