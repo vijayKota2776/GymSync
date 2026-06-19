@@ -58,7 +58,7 @@ fi
 
 # 5. Install deps and build frontend
 echo "📦 Installing dependencies..."
-npm ci
+npm install
 
 echo "🔨 Building frontend..."
 npm run build
