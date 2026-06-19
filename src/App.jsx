@@ -15,6 +15,7 @@ import Activity from './pages/Activity';
 import Pricing from './pages/Pricing';
 import Login from './pages/Login';
 import Workflows from './pages/Workflows';
+import Reports from './pages/Reports';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -48,6 +49,7 @@ function AppShell() {
             <Route path="/activity" element={<Activity />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/workflows" element={<Workflows />} />
+            <Route path="/reports" element={<Reports />} />
           </Routes>
         </main>
       </div>
