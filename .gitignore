@@ -1,3 +1,7 @@
+# SSH key — NEVER push this
+gymsync.pem
+*.pem
+
 # Dependencies
 node_modules/
 .pnp.*
