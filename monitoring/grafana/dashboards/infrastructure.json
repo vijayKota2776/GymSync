@@ -1,0 +1,252 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "CPU Usage %",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "red", "value": 85 }
+            ]
+          },
+          "unit": "percent", "min": 0, "max": 100
+        }
+      },
+      "targets": [{
+        "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+        "legendFormat": "CPU %"
+      }]
+    },
+    {
+      "title": "Memory Usage %",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent", "min": 0, "max": 100
+        }
+      },
+      "targets": [{
+        "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+        "legendFormat": "Memory %"
+      }]
+    },
+    {
+      "title": "Disk Usage %",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent", "min": 0, "max": 100
+        }
+      },
+      "targets": [{
+        "expr": "(1 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"})) * 100",
+        "legendFormat": "Disk %"
+      }]
+    },
+    {
+      "title": "Network I/O",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50000000 },
+              { "color": "red", "value": 100000000 }
+            ]
+          },
+          "unit": "Bps"
+        }
+      },
+      "targets": [{
+        "expr": "rate(node_network_receive_bytes_total{device!=\"lo\"}[5m])",
+        "legendFormat": "RX {{device}}"
+      }]
+    },
+    {
+      "title": "CPU Usage Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 20, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "percent"
+        }
+      },
+      "targets": [{
+        "expr": "100 - (avg by(cpu) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+        "legendFormat": "CPU {{cpu}}"
+      }]
+    },
+    {
+      "title": "Memory Usage Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 20, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "bytes"
+        }
+      },
+      "targets": [
+        { "expr": "node_memory_MemTotal_bytes", "legendFormat": "Total" },
+        { "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes", "legendFormat": "Used" },
+        { "expr": "node_memory_MemAvailable_bytes", "legendFormat": "Available" }
+      ]
+    },
+    {
+      "title": "Container CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 15, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "percent"
+        }
+      },
+      "targets": [{
+        "expr": "rate(container_cpu_usage_seconds_total{name=~\"gymsync.*\"}[5m]) * 100",
+        "legendFormat": "{{name}}"
+      }]
+    },
+    {
+      "title": "Container Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 15, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "bytes"
+        }
+      },
+      "targets": [{
+        "expr": "container_memory_usage_bytes{name=~\"gymsync.*\"}",
+        "legendFormat": "{{name}}"
+      }]
+    },
+    {
+      "title": "API Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 20, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "reqps"
+        }
+      },
+      "targets": [{
+        "expr": "rate(gymsync_http_requests_total[5m])",
+        "legendFormat": "{{method}} {{route}} ({{status}})"
+      }]
+    },
+    {
+      "title": "API Response Time (p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 15, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "ms"
+        }
+      },
+      "targets": [{
+        "expr": "gymsync_http_response_time_ms",
+        "legendFormat": "Response Time"
+      }]
+    },
+    {
+      "title": "Network Traffic",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 15, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "Bps"
+        }
+      },
+      "targets": [
+        { "expr": "rate(node_network_receive_bytes_total{device!=\"lo\"}[5m])", "legendFormat": "RX {{device}}" },
+        { "expr": "rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m])", "legendFormat": "TX {{device}}" }
+      ]
+    },
+    {
+      "title": "Disk I/O",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "fillOpacity": 15, "gradientMode": "scheme", "lineWidth": 2 },
+          "color": { "mode": "palette-classic" },
+          "unit": "Bps"
+        }
+      },
+      "targets": [
+        { "expr": "rate(node_disk_read_bytes_total[5m])", "legendFormat": "Read {{device}}" },
+        { "expr": "rate(node_disk_written_bytes_total[5m])", "legendFormat": "Write {{device}}" }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["gymsync", "infrastructure"],
+  "templating": {
+    "list": [{
+      "current": { "selected": false, "text": "Prometheus", "value": "Prometheus" },
+      "hide": 0,
+      "includeAll": false,
+      "name": "DS_PROMETHEUS",
+      "options": [],
+      "query": "prometheus",
+      "type": "datasource"
+    }]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "GymSync Infrastructure Dashboard",
+  "uid": "gymsync-infra",
+  "version": 1
+}
